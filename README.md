@@ -1,4 +1,4 @@
-# Pattern Scaling of Global Climate Variables to Local Climate Variables for use in Probabilistic Integrated Asessment Models
+# Pattern Scaling of Global Climate Variables to Local Climate Variables for Use in Probabilistic Integrated Assessment Models
 
 This repository provides an overview and replication of a pattern scaling approach used to recover local estimates of changes in surface temperature and changes in precipitation under various climate futures. The patterns are used in tandem with geopolitical boundaries and socioeconomic projections to recover area weighted, gdp weighted, and population weighted estimates of country and county-level (U.S.) average changes in climate variables that can be used as inputs to integrated assessment models. 
 
