@@ -1,5 +1,9 @@
-# R stuff
+## R stuff
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+
+## large files
+**TempNorm_1850to1900_global_temperature_norm.csv
+**total_forcing_total_forcing.csv
