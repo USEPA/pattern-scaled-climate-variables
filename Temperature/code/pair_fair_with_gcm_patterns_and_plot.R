@@ -99,6 +99,16 @@ data %<>%
     by = c('rank.csib' = 'SUM-rank')
   )
 
+## export
+data %>% 
+  filter(model %in% c('SSP245')) %>% 
+  select(trial, gcm.all, gcm.csib) %>% 
+  rename(fair_parameter_set = trial,
+         all_gcm_patterns   = gcm.all,
+         conus_gcm_patterns = gcm.csib) %>% 
+  distinct %>% 
+  write_csv('results/fair_parameter_sets_and_gcm_pattern_pairings.csv')
+
 ##########################
 ####################  plot
 ##########################
