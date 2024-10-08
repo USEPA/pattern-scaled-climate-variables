@@ -78,8 +78,10 @@ Murakami, D. and Yamagata, Y. (2016) Estimation of gridded population and GDP sc
 
 ## Patterns
 
+Kravitz B, Snyder A. (2023). Pangeo-Enabled ESM Pattern Scaling (PEEPS): A customizable dataset of emulated Earth System Model output. PLOS Clim 2(12): e0000159. https://doi.org/10.1371/journal.pclm.0000159
+
 Kravitz, B., Lynch, C., Hartin, C., and Bond-Lamberty, B.: Exploring precipitation pattern scaling methodologies and robustness among CMIP5 models, Geosci. Model Dev. Discuss., doi:10.5194/gmd-2016-258, in review, 2016.
 
-Kravitz, Ben, & Snyder, Abigail. (2022). Pangeo-Enabled ESM Pattern Scaling (PEEPS): A customizable dataset of emulated Earth System Model output [Data set]. Zenodo. https://doi.org/10.5281/zenodo.7139978
+Kravitz, B., & Snyder, A. (2022). Pangeo-Enabled ESM Pattern Scaling (PEEPS): A customizable dataset of emulated Earth System Model output [Data set]. Zenodo. https://doi.org/10.5281/zenodo.7139978
 
 Lynch, C., Hartin, C., Bond-Lamberty, B., and Kravitz, B.: An open-access CMIP5 pattern library for temperature and precipitation: Description and methodology, Earth Syst. Sci. Data Discuss., doi:10.5194/essd-2016-68, in review, 2017.
