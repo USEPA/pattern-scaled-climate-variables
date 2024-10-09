@@ -38,7 +38,7 @@ colors = c("#56B4E9", "#E69F00", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#C
 ##########################
 
 ## import from make_patterns_for_give.R
-patterns %>% 
+patterns =
   read_csv('results/pattern_scaling_precipitation_by_country_full_sample.csv',
            show_col_types = F)
 

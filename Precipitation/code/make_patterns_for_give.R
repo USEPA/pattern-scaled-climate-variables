@@ -306,17 +306,24 @@ iso3.list =
 patterns %<>% 
   filter(iso3 %in% iso3.list)
 
+## rename things for give
+patterns %<>%
+  rename(patterns.gdp_2000 = patterns.gdp.2000,
+         patterns.gdp_2100 = patterns.gdp.2100,
+         patterns.pop_2000 = patterns.pop.2000,
+         patterns.pop_2100 = patterns.pop.2100)
+
 ## export all
 patterns %>% 
-  write_csv('results/pattern_scaling_precipitation_by_country_full_sample.csv')
+  write_csv('results/pattern_scaling_precipitation_cmip6/pattern_scaling_precipitation_by_country_full_sample.csv')
 
 ## export patterns that omit non-continuous GCM patterns rasters
 patterns %>% 
   filter(!(source %in% c("ACCESS-ESM1-5", "MPI-ESM1-2-LR", "NESM3", "CanESM5", "MIROC-ES2L", "FGOALS-g3", "MIROC6", "IITM-ESM", "BCC-CSM2-MR", "CAMS-CSM1-0", "MRI-ESM2-0"))) %>% 
-  write_csv('results/pattern_scaling_precipitation_by_country_restricted_sample.csv')
+  write_csv('results/pattern_scaling_precipitation_cmip6/pattern_scaling_precipitation_by_country_restricted_sample.csv')
 
 ## export by averaging and SSP
-for (METHOD in c('area', 'gdp.2000', 'pop.2000', 'gdp.2100', 'pop.2100')) {
+for (METHOD in c('area', 'gdp_2000', 'pop_2000', 'gdp_2100', 'pop_2100')) {
   for (SSP in c('ssp1', 'ssp2', 'ssp3', 'ssp4', 'ssp5'))
     
     # ## test 
