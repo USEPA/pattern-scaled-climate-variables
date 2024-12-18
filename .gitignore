@@ -7,3 +7,8 @@
 ## large files
 **TempNorm_1850to1900_global_temperature_norm.csv
 **total_forcing_total_forcing.csv
+
+## large files in Validation
+**Land_and_Ocean_EqualArea.nc               ## berkely gridded data: https://berkeleyearth.org/data/
+**cmip6_patterns.csv                        ## pattern output from GIVE runs
+**fair_global_mean_surface_temperature.csv  ## gmst from GIVE runs
