@@ -161,8 +161,9 @@ ggsave('results/figures/fair_gcm_rankings_all.svg',
 
 
 data %>%
+  filter(model %in% c('SSP245')) %>% 
   ggplot() +
-  facet_wrap(~model, scales = 'free', ncol = 1) +
+  # facet_wrap(~model, scales = 'free', ncol = 1) +
   geom_line(aes(x     = year, 
                 y     = gmst, 
                 color = fct_reorder(gcm.csib, rank.csib),
@@ -181,8 +182,10 @@ data %>%
        group     = '',
        fill      = '') +
   theme_minimal() +
-  theme(legend.position = 'right',
-        legend.justification = c(1, 0),
+  theme(legend.position = 'inside',
+        legend.position.inside = c(0.2,0.8),
+        #     legend.position = 'right',
+        # legend.justification = c(1, 0),
         legend.title     = element_text(size = 14, color='grey20'),
         legend.text      = element_text(size = 14, color='grey20'),
         legend.key.size  = unit(1, 'cm'),
@@ -199,12 +202,13 @@ data %>%
         plot.title       = element_text(size = 12, hjust = 0.5),
         # plot.margin      = unit(c(t = 0, r = 0.5, b = 0, l = 0.5), 'cm'),
         text             = element_text(family = 'sans-serif', color = 'grey20')) + 
-  guides(color = guide_legend(reverse = T))
+  guides(color = guide_legend(reverse = T,
+                              override.aes = list(alpha = 1)))
 
 ## export
 ggsave('results/figures/fair_gcm_rankings_csib.svg', 
-       width  = 16, 
-       height = 12)
+       width  = 9, 
+       height = 6)
 
 
 ################################ scatter 
@@ -317,10 +321,11 @@ ggsave('results/figures/fair_gcm_rankings_all_points_marked_gcms.svg',
 
 
 ggplot() +
-  facet_wrap(~model, scales = 'free', ncol = 1) +
+  # facet_wrap(~model, scales = 'free', ncol = 1) +
   geom_point(data = data %>%
-               filter(year == 2100),
-             aes(x     = rank.csib, 
+               filter(year == 2100,
+                      model %in% c('SSP245')),
+             aes(x     = paste0(rank.csib, ' - ', gcm.csib), 
                  y     = gmst, 
                  color = fct_reorder(gcm.csib, rank.csib),
                  group = interaction(gcm.csib, trial)),
@@ -338,30 +343,35 @@ ggplot() +
        group     = '',
        fill      = '') +
   theme_minimal() +
-  theme(legend.position = 'right',
-        legend.justification = c(1, 0),
-        legend.title     = element_text(size = 14, color='grey20'),
-        legend.text      = element_text(size = 14, color='grey20'),
-        legend.key.size  = unit(1, 'cm'),
-        legend.margin    = margin(0, 0, 0, 0),
-        axis.title       = element_text(size = 14),
-        axis.text        = element_text(size = 14),
-        axis.line.x      = element_line(color = "black"),
-        axis.ticks.x     = element_line(color = "black", size = 1),
-        strip.text       = element_text(color = 'grey20', size = 14, face = 'bold'), 
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = 'grey70', linetype = 'dotted'),
-        panel.grid.minor = element_blank(),
-        plot.caption     = element_text(size = 12, hjust = 0.5),
-        plot.title       = element_text(size = 12, hjust = 0.5),
-        # plot.margin      = unit(c(t = 0, r = 0.5, b = 0, l = 0.5), 'cm'),
-        text             = element_text(family = 'sans-serif', color = 'grey20')) + 
-  guides(color = guide_legend(reverse = T))
+  theme(
+    legend.position = 'inside',
+    # legend.justification = c(1, 0),
+    legend.position.inside = c(0.2,0.8),
+    legend.title     = element_text(size = 14, color='grey20'),
+    legend.text      = element_text(size = 14, color='grey20'),
+    legend.key.size  = unit(1, 'cm'),
+    legend.margin    = margin(0, 0, 0, 0),
+    axis.title       = element_text(size = 14),
+    axis.text        = element_text(size = 14),
+    axis.line.x      = element_line(color = "black"),
+    axis.text.x = element_text(angle = -45, hjust = 0),
+    axis.ticks.x     = element_line(color = "black", size = 1),
+    strip.text       = element_text(color = 'grey20', size = 14, face = 'bold'), 
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_line(color = 'grey70', linetype = 'dotted'),
+    panel.grid.minor = element_blank(),
+    plot.caption     = element_text(size = 12, hjust = 0.5),
+    plot.title       = element_text(size = 12, hjust = 0.5),
+    # plot.margin      = unit(c(t = 0, r = 0.5, b = 0, l = 0.5), 'cm'),
+    text             = element_text(family = 'sans-serif', color = 'grey20')) + 
+  # guides(color = guide_legend(reverse = T,
+  #                             override.aes = list(alpha = 1)))
+  guides(color ='none')
 
 ## export
 ggsave('results/figures/fair_gcm_rankings_csib_gcms.svg', 
-       width  = 16, 
-       height = 12)
+       width  = 9, 
+       height = 6)
 
 
 ## end of script, have a great day.
