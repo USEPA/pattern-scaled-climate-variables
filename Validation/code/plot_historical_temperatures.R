@@ -10,7 +10,8 @@ gc()
 list.of.packages <- c('magrittr','tidyverse',
                       'sf',
                       'ggplot2','egg','showtext','RColorBrewer',
-                      'rworldmap')
+                      'rworldmap',
+                      'arrow')
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages, repos = "http://cran.rstudio.com/")
 lapply(list.of.packages, library, character.only = TRUE)
@@ -37,12 +38,12 @@ nine.countries = c('USA', 'CHN', 'IND', 'IDN', 'PAK', 'NGA', 'BRA', 'BGD', 'RUS'
 
 ## read data from get_historical_patterns_by_country.R
 historical.berkeley = 
-  read_csv('results/historical_average_temperature_berkeley.csv',
+  read_csv('results/historical_average_temperature.csv',
            show_col_types = F)
 
 ## global mean surface temperature from berkeley
 gmst.berkeley = 
-  read_csv('results/historical_average_global_mean_surface_temperature_berkeley.csv',
+  read_csv('results/historical_average_global_mean_surface_temperature.csv',
            show_col_types = F)
 
 ## temperatures from berkeley earth are: "in Celsius and reported as anomalies relative to the Jan 1951-Dec 1980 average"
@@ -61,31 +62,42 @@ gmst.berkeley %<>%
 
 ## gmst from fair, change since preindustrial 1850-1900 averages
 gmst.fair = 
-  read_csv('data/give_output/fair_global_mean_surface_temperature.csv',
-           show_col_types = F) %>% 
-  rename(gmst = global_temperature) %>% 
+  read_parquet('../Temperature/data/TempNorm_1850to1900_global_temperature_norm.parquet') %>% 
+  rename(gmst = global_temperature_norm) %>% 
   filter(time %in% 1900:2023) %>% 
   rename(year = time) %>% 
   summarise(gmst.mean = mean(gmst, na.rm = T),
+            gmst.01   = quantile(gmst, 0.01),
             gmst.05   = quantile(gmst, 0.05),
             gmst.95   = quantile(gmst, 0.95),
+            gmst.99   = quantile(gmst, 0.99),
             .by = year)
+
+
 
 ## patterns from give
 patterned.country.temperatures = 
-  read_csv('data/give_output/cmip6_patterns.csv',
-           show_col_types = F) %>% 
-  rename(iso3 = country) %>% 
-  dplyr::select(-trialnum) %>% 
+  # read_csv('data/give_output/cmip6_patterns.csv',
+  #          show_col_types = F) %>% 
+  read_csv('../Temperature/results/cmip6_patterns_by_country.csv',
+           show_col_types = F) %>%
+  filter(scenario == 'ssp2',
+         iso3 %in% nine.countries) %>% 
+  dplyr::select(iso3, patterns.pop.2000, scenario, source) %>% 
+  rename(pattern = patterns.pop.2000) %>% 
   distinct %>% 
   cross_join(gmst.fair) %>% 
   mutate(country.temp.mean = gmst.mean * pattern,
+         country.temp.01   = gmst.01 * pattern,
          country.temp.05   = gmst.05 * pattern,
-         country.temp.95   = gmst.95 * pattern) %>% 
+         country.temp.95   = gmst.95 * pattern,
+         country.temp.99   = gmst.99 * pattern) %>% 
   summarise(country.temp.mean = mean(country.temp.mean, na.rm = T),
             country.temp.med  = quantile(country.temp.mean, probs = 0.50),
+            country.temp.01   = quantile(country.temp.01, probs = 0.01),
             country.temp.05   = quantile(country.temp.05, probs = 0.05),
             country.temp.95   = quantile(country.temp.95, probs = 0.95),
+            country.temp.99   = quantile(country.temp.99, probs = 0.99),
             .by = c('iso3', 'year'))
 
 # pats =
@@ -116,10 +128,10 @@ ggplot() +
   ) +
   geom_ribbon(data = gmst.fair,
               aes(x     = year,
-                  ymin  = gmst.05,
-                  ymax  = gmst.95,
+                  ymin  = gmst.01,
+                  ymax  = gmst.99,
                   fill  = 'GMST - FaIRv1.6.2'),
-              alpha = 0.05
+              alpha = 0.1
   ) +
   
   ## historical gmst from berkeley
@@ -146,15 +158,16 @@ ggplot() +
     color    = '',
     linetype = ''
   ) +
-  theme_classic(base_family = "Times New Roman") + 
+  theme_classic() + 
   theme(
+    text = element_text(family="serif"),
     legend.position = 'bottom',
     legend.key.spacing.x = unit(2, 'cm'),
     panel.grid.major.y = element_line(color = 'grey70', linetype = 'dotted'),
-    axis.text = element_text(size = rel(1), color = "black"),   # Increase size and set color to black for axis text
-    axis.title = element_text(size = rel(1), color = "black"),  # Increase size and set color to black for axis titles
-    legend.text = element_text(size = rel(1), color = "black"), # Increase size and set color to black for legend text
-    legend.title = element_text(size = rel(1), color = "black") # Increase size and set color to black for legend title
+    axis.text = element_text(size = rel(3), color = "black"),   # Increase size and set color to black for axis text
+    axis.title = element_text(size = rel(3), color = "black"),  # Increase size and set color to black for axis titles
+    legend.text = element_text(size = rel(3), color = "black"), # Increase size and set color to black for legend text
+    legend.title = element_text(size = rel(3), color = "black") # Increase size and set color to black for legend title
   ) + 
   # theme_minimal() +
   # theme(legend.position = 'bottom',
@@ -178,8 +191,8 @@ ggplot() +
          linetype = guide_legend(order = 2))
 
 ## export
-ggsave('results/gmst_comparison_paper.svg', width = 9, height = 6)
-
+# ggsave('results/gmst_comparison.svg', width = 9, height = 6)
+ggsave('results/downscaling_1.png', width = 9, height = 6)
 
 ## country level temperature
 # plot.countries =
@@ -215,16 +228,16 @@ ggplot() +
             aes(x        = year,
                 y        = country.temp.mean,
                 color    = iso3,
-                linetype = 'Implied Historical \nPatterned GMST from FaIR'),
+                linetype = 'Implied Historical Patterned GMST from FaIR'),
             linewidth = 1
   ) +
   geom_ribbon(data = patterned.country.temperatures %>%
                 filter(iso3 %in% nine.countries),
               aes(x    = year,
-                  ymin = country.temp.05,
-                  ymax = country.temp.95,
+                  ymin = country.temp.01,
+                  ymax = country.temp.99,
                   fill = iso3),
-              alpha = 0.3
+              alpha = 0.5
   ) +
   
   scale_x_continuous(limits = c(1900, 2027),
@@ -252,7 +265,7 @@ ggplot() +
                                'BGD' = 'Bangladesh', 
                                'RUS' = 'Russia'),
                     breaks = nine.countries) +
-  scale_linetype_manual(breaks = c('Implied Historical \nPatterned GMST from FaIR', 'Historical'),
+  scale_linetype_manual(breaks = c('Implied Historical Patterned GMST from FaIR', 'Historical'),
                         values = c('solid', 'dashed', 'dotted')) +
   labs(
     x        = 'Year',
@@ -260,19 +273,20 @@ ggplot() +
     color    = '',
     linetype = ''
   ) +
-  theme_classic(base_family = "Times New Roman") + 
+  theme_classic() + 
   theme(
+    text = element_text(family="serif"),
     legend.position  = 'inside',
     legend.position.inside = c(0.75, 0.1),
-    legend.key.spacing.y = unit(0.5, 'cm'),
+    # legend.key.spacing.y = unit(0.5, 'cm'),
     legend.key.width = unit(1.75, 'cm'),
-    strip.text       = element_text(size = rel(1.2)),
+    strip.text       = element_text(size = rel(3)),
     panel.grid.major.y = element_line(color = 'grey70', linetype = 'dotted'),
     panel.spacing.x  = unit(2, 'cm'), 
-    axis.text = element_text(size = rel(1), color = "black"),   # Increase size and set color to black for axis text
-    axis.title = element_text(size = rel(1.2), color = "black"),  # Increase size and set color to black for axis titles
-    legend.text = element_text(size = rel(1.5), color = "black"), # Increase size and set color to black for legend text
-    legend.title = element_text(size = rel(1), color = "black") # Increase size and set color to black for legend title
+    axis.text = element_text(size = rel(2.5), color = "black"),   # Increase size and set color to black for axis text
+    axis.title = element_text(size = rel(3), color = "black"),  # Increase size and set color to black for axis titles
+    legend.text = element_text(size = rel(2.5), color = "black"), # Increase size and set color to black for legend text
+    legend.title = element_text(size = rel(2), color = "black") # Increase size and set color to black for legend title
   ) + 
   # theme_minimal() +
   # theme(legend.position  = 'inside',
@@ -299,6 +313,7 @@ ggplot() +
          linetype = guide_legend(order = 2))
 
 ## export
-ggsave('results/country_temperaure_comparison_paper.svg', width = 12, height = 12)
+# ggsave('results/country_temperaure_comparison.svg', width = 12, height = 12)
+ggsave('results/downscaling_2.png', width = 9, height = 9)
 
 ## end of script. have a great day!
