@@ -29,7 +29,7 @@ lapply(list.of.packages, library, character.only = TRUE)
 ##########################
 
 ## all files in the directory
-files <- list.files('us_scghg/data/gmst_patterns/cmip6', full.names=T) %>%
+files <- list.files('data/patterns/cmip6', full.names=T) %>%
   stringr::str_subset(., "broken", negate =T)
 
 ## base file
@@ -63,6 +63,6 @@ for (i in 1:length(files)) {
 }
 
 ## save
-write_csv(patterns,'us_scghg/data/gmst_patterns/cmip6_pattern_scaling_by_county.csv')
+write_csv(patterns,'data/patterns/cmip6_pattern_scaling_by_county.csv')
 
 ## END OF SCRIPT. Have a great day!
