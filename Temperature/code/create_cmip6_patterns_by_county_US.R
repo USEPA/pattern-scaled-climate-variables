@@ -58,7 +58,7 @@ for (i in 1:length(files)) {
   patterns = bind_rows(patterns, 
                        county %>% 
                          st_drop_geometry() %>% 
-                         mutate(source    = substr(str_split(files[i],'/')[[1]][[5]], 17, nchar(str_split(files[i],'/')[[1]][[5]])-10), 
+                         mutate(source    = substr(str_split(files[i],'/')[[1]][[4]], 17, nchar(str_split(files[i],'/')[[1]][[4]])-10), 
                                 source.id = i))
 }
 
